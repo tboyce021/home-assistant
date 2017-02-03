@@ -21,6 +21,7 @@ CONF_SERVICE_TEMPLATE = 'service_template'
 CONF_SERVICE_ENTITY_ID = 'entity_id'
 CONF_SERVICE_DATA = 'data'
 CONF_SERVICE_DATA_TEMPLATE = 'data_template'
+CONF_SERVICE_DATA_EVAL = 'data_eval'
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -86,6 +87,11 @@ def async_call_from_config(hass, config, blocking=False, variables=None,
             return value.async_render(variables)
         service_data.update(_data_template_creator(
             config[CONF_SERVICE_DATA_TEMPLATE]))
+            
+    if CONF_SERVICE_DATA_EVAL in config:
+        value = config[CONF_SERVICE_DATA_EVAL]
+        value.hass = hass
+        service_data.update(eval(value.async_render(variables)))
 
     if CONF_SERVICE_ENTITY_ID in config:
         service_data[ATTR_ENTITY_ID] = config[CONF_SERVICE_ENTITY_ID]
